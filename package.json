@@ -2,10 +2,10 @@
   "name": "nodejsandexpressjs",
   "version": "1.0.0",
   "description": "",
-  "main": "./login/app.js",
+  "main": "./weather/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./login/app.js"
+    "start": "nodemon ./weather/app.js"
   },
   "keywords": [],
   "author": "",
