@@ -28,14 +28,20 @@ app.post('/weather', (req, res) => {
 
         respond.on('data', (data) => {
             weatherData = JSON.parse(data);
-            const temp = weatherData.main.temp;
-            const weatherDescription = weatherData.weather[0].description;
-            const icon = weatherData.weather[0].icon;
-            const imageIconUrl = "https://openweathermap.org/img/wn/" + icon + "@2x.png"
-            res.write("<h1 style='color: brown'> Weather </h1>");
-            res.write("<h2> The temperature in " + query + " is " + temp + "</h2>");
-            res.write("<image src= " + imageIconUrl + "></image>")
-            res.send();
+            const cod = weatherData.cod;
+            if (cod == 404) {
+                res.write("<h1 style='color: red'>ERROR NO DATA</h1>");
+                res.send();
+            } else {
+                const temp = weatherData.main.temp;
+                const weatherDescription = weatherData.weather[0].description;
+                const icon = weatherData.weather[0].icon;
+                const imageIconUrl = "https://openweathermap.org/img/wn/" + icon + "@2x.png"
+                res.write("<h1 style='color: brown'> Weather </h1>");
+                res.write("<h2> The temperature in " + query + " is " + temp + "</h2>");
+                res.write("<image src= " + imageIconUrl + "></image>")
+                res.send();
+            }
         });
     });
 });
