@@ -46,15 +46,6 @@ app.post('/weather', (req, res) => {
     });
 });
 
-
-
-
-
-
-// app.get('/data', (req, res) => {
-//     res.send("<h1>nguyen tien loi" + weatherData.weather + "</h1>");
-// })
-
 app.listen(POST);
 
 

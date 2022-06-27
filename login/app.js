@@ -1,10 +1,10 @@
 // xu ly bieu mau
+const https = require('https');
+const path = require('path');
 const express = require('express');
-const { request } = require('http');
 // module xu ly bieu mau phan tich cu phap  
 const bodyParser = require('body-parser'); //https://www.npmjs.com/package/body-parser#bodyparserurlencodedoptions
 
-const path = require('path');
 
 //module xu ly coi la cau truc file json co dung nhu la ta mong muon khong
 //https://viblo.asia/p/verify-json-request-nodejs-voi-joi-V3m5WLpgKO7
@@ -12,8 +12,10 @@ const Joi = require('joi');
 
 
 
-const app = express();
 
+
+const app = express();
+const POST = 3000;
 
 // su dung phan mem trung gian
 app.use('/css', express.static(__dirname + '/html/css'));
@@ -38,12 +40,12 @@ app.get('/login', (request, respond) => {
 // });
 
 // cho phep nguoi dung dua thong tin len server
-app.post('/logout', (request, respond) => {
+app.post('/logout', (req, res) => {
     //https://www.w3schools.com/js/js_json_parse.asp
     // const obj = JSON.parse(JSON.stringify(request.body)); // req.body = [Object: null prototype] { title: 'product' }
     // console.log(typeof (request.body));
 
-    console.log(request.body);
+    console.log(req.body);
 
     // xac thuc lai coi mail pass co dung cau truc khong
     var schema = Joi.object().keys({
@@ -51,18 +53,58 @@ app.post('/logout', (request, respond) => {
         password: Joi.string().min(5).max(20).required()
     });
 
-    const { error } = schema.validate(request.body);
+    const { error } = schema.validate(req.body);
     if (error) {
-        respond.send(error.details[0].message);
+        res.send(error.details[0].message);
+        console.log(error.details[0].message);
+        return;
     }
-    else {
-        respond.send("sucessfully")
+
+    // dua thong tin ve mail qua trang web mailchimp.com
+    var mail = req.body.email;
+    var pass = req.body.password;
+    // chuyen data ve dang json
+    var data = {
+        members: [
+            {
+                email_address: mail,
+                status: "subscribed",
+                merge_fields: {
+                    FNAME: pass
+                }
+            }
+        ]
     }
+    var jsonData = JSON.stringify(data);
 
+    const url = "https://us14.api.mailchimp.com/3.0/lists/871dc6f37b";
 
-    //database word here
-    //respond.send("oke thanh cong");
+    const options = {
+        method: "POST",
+        auth: "angele1:8bb34019ba210bf17463c1885c887885-us14"
+    };
 
+    const request = https.request(url, options, (response) => {
+        if (response.statusCode === 200) {
+            res.send("sucessfully");
+        }
+        else {
+            res.send("error")
+        }
+
+        response.on("data", (data) => {
+            console.log(JSON.parse(data));
+        })
+    });
+    request.write(jsonData);
+    request.end();
 });
 
-app.listen(3000);
+app.listen(POST, () => {
+    console.log("listen sucessful")
+});
+
+
+// API key 8bb34019ba210bf17463c1885c887885-us14
+
+// listID 871dc6f37b
